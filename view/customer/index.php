@@ -11,39 +11,15 @@ include(__DIR__ . '/../layout/header.php');
 
 ?>
    
-    <div class="container-fluid pt-2">
+    <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
-            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
-                <div class="position-sticky pt-3">
-                    <ul class="nav flex-column">
-                                                
-                        <li class="nav-item">
-                            <a class="nav-link <?= $currentPage == 'customer' ? 'active' : '' ?>" href="<?php echo(SITE_URL.'/portal');?>">
-                                <i class="fas fa-users"></i>
-                                Clientes
-                            </a>
-                        </li>
-                        
-                        <li class="nav-item">
-                            <a class="nav-link <?= $currentPage == 'users' ? 'active' : '' ?>" href="">
-                                <i class="fas fa-user-tie"></i>
-                                Usuários
-                            </a>
-                        </li>
-
-                        <li class="nav-item logout-section">
-                        <a class="nav-link logout-link" href="<?php echo(SITE_URL.'/logout');?>" onclick="return confirm('Tem certeza que deseja sair?');">
-                            <i class="fas fa-sign-out-alt"></i>
-                            Sair
-                        </a>
-                    </li>
-                    </ul>
-                </div>
-            </nav>
+            <?php
+                include(__DIR__ . '/../layout/nav.php');
+            ?>
 
             <!-- Main content -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content pt-4">
                 <!-- Mensagens -->
                 <?php if (isset($_SESSION['success'])): ?>
                     <div class="alert alert-success alert-dismissible fade show" role="alert">

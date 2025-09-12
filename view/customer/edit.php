@@ -282,7 +282,7 @@ $currentPage = 'clientes';
             </nav>
 
             <!-- Main content -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content pt-4">
                 <!-- Cabeçalho -->
                 <div class="page-header">
                     <div class="d-flex justify-content-between align-items-center">

@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../model/Customer.php';
+require_once __DIR__ . '/../model/CustomerAddress.php';
 require_once __DIR__ . '/AuthController.php';
 
 /**
@@ -68,33 +69,42 @@ class CustomerController {
         }
         
         $dados = [
-            'nome' => trim($_POST['nome'] ?? ''),
-            'telefone' => preg_replace('/\D/', '', $_POST['telefone'] ?? ''),
+            'name' => trim($_POST['name'] ?? ''),
+            'phone' => preg_replace('/\D/', '', $_POST['phone'] ?? ''),
             'email' => filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL),
-            'data_nascimento' => $_POST['data_nascimento'] ?? null,
-            'endereco' => trim($_POST['endereco'] ?? ''),
-            'observacoes' => trim($_POST['observacoes'] ?? '')
+            'date_birth' => $_POST['date_birth'] ?? null
         ];
         
         // Validações
         $errors = $this->validateCliente($dados);
         
         if (!empty($errors)) {
-            $_SESSION['errors'] = $errors;
+            $_SESSION['error'] = implode("<br>", $errors);
             $_SESSION['form_data'] = $dados;
-            header('Location: ' . SITE_URL . '/clientes/create');
+            header('Location: ' . SITE_URL . '/cliente');
             exit;
         }
         
-        $customerModel = new Cliente();
+        $customerModel = new Customer();
+        $customerAddressModel = new CustomerAddress();
+
+        $addresses = $_POST['addresses'];
+
         $customerId = $customerModel->create($dados);
         
         if ($customerId) {
+            $customerAddressModel->deactivateAll($customerId);
+            foreach ($addresses as $endereco) {
+                if (!empty(trim($endereco))) {
+                    $dataAddress = ['id_customer' => $clienteId, 'address' => $endereco];
+                    $customerAddressModel->create($dataAddress);
+                }
+            }
             $_SESSION['success'] = 'Cliente cadastrado com sucesso!';
-            header('Location: ' . SITE_URL . '/clientes');
+            header('Location: ' . SITE_URL . '/portal');
         } else {
             $_SESSION['error'] = 'Erro ao cadastrar cliente';
-            header('Location: ' . SITE_URL . '/clientes/create');
+            header('Location: ' . SITE_URL . '/cliente');
         }
         exit;
     }
@@ -202,7 +212,7 @@ public function show($id) {
         $this->authController->requireLogin();
 
         
-        $customerModel = new Cliente();
+        $customerModel = new Customer();
         $customer = $customerModel->getById($id);
 
         if (!$customer) {
@@ -227,7 +237,7 @@ public function show($id) {
             exit;
         }
         
-        $customerModel = new Cliente();
+        $customerModel = new Customer();
         $customer = $customerModel->getById($id);
         
         if (!$customer) {
@@ -237,10 +247,10 @@ public function show($id) {
         }
         
         $dados = [
-            'nome' => trim($_POST['nome'] ?? ''),
-            'telefone' => preg_replace('/\D/', '', $_POST['telefone'] ?? ''),
+            'nome' => trim($_POST['name'] ?? ''),
+            'telefone' => preg_replace('/\D/', '', $_POST['phone'] ?? ''),
             'email' => filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL),
-            'data_nascimento' => $_POST['data_nascimento'] ?? null,
+            'data_nascimento' => $_POST['date_birth'] ?? null,
             'endereco' => trim($_POST['endereco'] ?? ''),
             'observacoes' => trim($_POST['observacoes'] ?? ''),
             'ativo' => 1
@@ -250,7 +260,7 @@ public function show($id) {
         $errors = $this->validateCliente($dados, $id);
         
         if (!empty($errors)) {
-            $_SESSION['errors'] = $errors;
+            $_SESSION['error'] = $errors;
             $_SESSION['form_data'] = $dados;
             header('Location: ' . SITE_URL . '/clientes/edit/' . $id);
             exit;
@@ -272,7 +282,7 @@ public function show($id) {
 public function delete($id) {
         $this->authController->requireAdmin();
         
-        $customerModel = new Cliente();
+        $customerModel = new Customer();
         $customer = $customerModel->getById($id);
         
         if (!$customer) {
@@ -311,20 +321,20 @@ public function delete($id) {
         $errors = [];
         
         // Nome obrigatório
-        if (empty($dados['nome'])) {
+        if (empty($dados['name'])) {
             $errors[] = 'Nome é obrigatório';
-        } elseif (strlen($dados['nome']) < 2) {
+        } elseif (strlen($dados['name']) < 2) {
             $errors[] = 'Nome deve ter pelo menos 2 caracteres';
         }
         
         // Telefone obrigatório e único
-        if (empty($dados['telefone'])) {
+        if (empty($dados['phone'])) {
             $errors[] = 'Telefone é obrigatório';
-        } elseif (strlen($dados['telefone']) < 10) {
+        } elseif (strlen($dados['phone']) < 10) {
             $errors[] = 'Telefone deve ter pelo menos 10 dígitos';
         } else {
-            $customerModel = new Cliente();
-            if ($customerModel->telefoneExists($dados['telefone'], $customerId)) {
+            $customerModel = new Customer();
+            if ($customerModel->telefoneExists($dados['phone'], $customerId)) {
                 $errors[] = 'Este telefone já está cadastrado para outro cliente';
             }
         }
@@ -334,7 +344,7 @@ public function delete($id) {
             if (!filter_var($dados['email'], FILTER_VALIDATE_EMAIL)) {
                 $errors[] = 'Email inválido';
             } else {
-                $customerModel = new Cliente();
+                $customerModel = new Customer();
                 if ($customerModel->emailExists($dados['email'], $customerId)) {
                     $errors[] = 'Este email já está cadastrado para outro cliente';
                 }
@@ -342,9 +352,9 @@ public function delete($id) {
         }
         
         // Data de nascimento (opcional, mas se informada deve ser válida)
-        if (!empty($dados['data_nascimento'])) {
-            $dataNasc = DateTime::createFromFormat('Y-m-d', $dados['data_nascimento']);
-            if (!$dataNasc || $dataNasc->format('Y-m-d') !== $dados['data_nascimento']) {
+        if (!empty($dados['date_birth'])) {
+            $dataNasc = DateTime::createFromFormat('Y-m-d', $dados['date_birth']);
+            if (!$dataNasc || $dataNasc->format('Y-m-d') !== $dados['date_birth']) {
                 $errors[] = 'Data de nascimento inválida';
             } elseif ($dataNasc > new DateTime()) {
                 $errors[] = 'Data de nascimento não pode ser futura';
