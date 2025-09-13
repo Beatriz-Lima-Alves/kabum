@@ -215,9 +215,9 @@ include(__DIR__ . '/../layout/header.php');
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Buscar por</label>
-                            <input type="text" name="busca" class="form-control" 
+                            <input type="text" name="search" class="form-control" 
                                    placeholder="Nome, telefone ou email..."
-                                   value="<?= $_GET['busca'] ?? '' ?>">
+                                   value="<?= $_GET['search'] ?? '' ?>">
                         </div>
                         
                     </div>
@@ -304,22 +304,6 @@ include(__DIR__ . '/../layout/header.php');
             });
         }, 5000);
         
-        // Verificar se as funções estão funcionando
-        
-        
-        // Adicionar event listeners extras para debug
-        const deleteButtons = document.querySelectorAll('button[onclick*="confirmarExclusao"]');
-        
-        
-        deleteButtons.forEach((button, index) => {
-            
-            
-            // Adicionar evento de click extra para teste
-            button.addEventListener('click', function(e) {
-                
-                
-            });
-        });
     });
     </script>
 
