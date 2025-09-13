@@ -23,14 +23,15 @@ class CustomerController {
         
         // Filtros
         $search = $_GET['search'] ?? '';
-        $limit = $_GET['limit'] ?? 50;
+        $limit = $_GET['limit'] ?? 10;
         $page = $_GET['page'] ?? 1;
+
         
         // Calcular offset para paginação
         $offset = ($page - 1) * $limit;
         
         // Buscar clientes
-        $customers = $customerModel->getAll(1, $limit, $search);
+        $customers = $customerModel->getAll(1, $limit, $search, $offset);
         
         // Contar total para paginação
         $totalCustomer = $customerModel->count();
@@ -96,7 +97,7 @@ class CustomerController {
             $customerAddressModel->deactivateAll($customerId);
             foreach ($addresses as $endereco) {
                 if (!empty(trim($endereco))) {
-                    $dataAddress = ['id_customer' => $clienteId, 'address' => $endereco];
+                    $dataAddress = ['id_customer' => $customerId, 'address' => $endereco];
                     $customerAddressModel->create($dataAddress);
                 }
             }

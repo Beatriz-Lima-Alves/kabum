@@ -79,10 +79,10 @@ include(__DIR__ . '/../layout/header.php');
                             <div class="col-md-6">
                                 <label for="email" class="form-label">
                                     <i class="fas fa-envelope me-1"></i>
-                                    E-mail
+                                    E-mail *
                                 </label>
                                 <input type="email" class="form-control" id="email" name="email" 
-                                       placeholder="cliente@email.com">
+                                       placeholder="cliente@email.com" required>
                             </div>
                             
                             <div class="col-md-6">
@@ -103,7 +103,7 @@ include(__DIR__ . '/../layout/header.php');
 
                             <div id="enderecos-container">
                                 <div class="input-group mb-2">
-                                    <input type="text" class="form-control" name="addresses[]" placeholder="Rua, número, bairro, cidade">
+                                    <input type="text" class="form-control" name="addresses[]" placeholder="Rua, número, bairro, cidade" required>
                                     <button type="button" class="btn btn-danger remove-endereco">
                                         <i class="fas fa-trash"></i>
                                     </button>
@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const div = document.createElement('div');
         div.classList.add('input-group', 'mb-2');
         div.innerHTML = `
-            <input type="text" class="form-control" name="addresses[]" placeholder="Rua, número, bairro, cidade">
+            <input type="text" class="form-control" name="addresses[]" placeholder="Rua, número, bairro, cidade" required>
             <button type="button" class="btn btn-danger remove-endereco">
                 <i class="fas fa-trash"></i>
             </button>

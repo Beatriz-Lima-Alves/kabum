@@ -7,6 +7,7 @@
             --info-color: #3B82F6;
         }
 
+
 body {
     background: linear-gradient(135deg, #667eea 0%, #0060b1 100%);
     min-height: 100vh;
@@ -248,6 +249,21 @@ body {
     margin-top: auto; 
     border-top: 1px solid rgba(255, 255, 255, 0.2);
     padding-top: 1rem;
+}
+
+ .avatar-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.bg-accent{
+    background-color: var(--accent-color);
 }
 @keyframes float {
     0%, 100% { transform: translateY(0px); }

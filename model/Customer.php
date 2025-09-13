@@ -15,11 +15,11 @@ class customer {
     }
     
     /**
-     * Buscar cliente por telefone
+     * Buscar cliente por phone
      */
-    public function getByTelefone($telefone) {
-        $sql = "SELECT * FROM customer WHERE telefone = ? AND active = 1";
-        return DB::selectOne($sql, [$telefone]);
+    public function getByphone($phone) {
+        $sql = "SELECT * FROM customer WHERE phone = ? AND active = 1";
+        return DB::selectOne($sql, [$phone]);
     }
     
     /**
@@ -33,7 +33,7 @@ class customer {
     /**
      * Listar todos os customer
      */
-    public function getAll($active = null, $limit = null, $search = null) {
+    public function getAll($active = null, $limit = null, $search = null, $offset = null) {
         $sql = "SELECT * FROM customer";
         $params = [];
         $conditions = [];
@@ -44,7 +44,7 @@ class customer {
         }
         
         if ($search) {
-            $conditions[] = "(nome LIKE ? OR telefone LIKE ? OR email LIKE ?)";
+            $conditions[] = "(name LIKE ? OR phone LIKE ? OR email LIKE ?)";
             $searchTerm = "%$search%";
             $params[] = $searchTerm;
             $params[] = $searchTerm;
@@ -55,11 +55,15 @@ class customer {
             $sql .= " WHERE " . implode(" AND ", $conditions);
         }
         
-        $sql .= " ORDER BY nome";
+        $sql .= " ORDER BY name";
         
         if ($limit) {
             $sql .= " LIMIT ?";
             $params[] = $limit;
+            if ($offset !== null) {
+                $sql .= " OFFSET ?";
+                $params[] = (int)$offset;
+            }
         }
         
         return DB::select($sql, $params);
@@ -87,8 +91,8 @@ class customer {
      */
     public function update($id, $dados) {
         $sql = "UPDATE customer SET 
-                nome = ?, 
-                telefone = ?, 
+                name = ?, 
+                phone = ?, 
                 email = ?, 
                 data_nascimento = ?, 
                 endereco = ?, 
@@ -97,8 +101,8 @@ class customer {
                 WHERE id = ?";
         
         $params = [
-            $dados['nome'],
-            $dados['telefone'],
+            $dados['name'],
+            $dados['phone'],
             $dados['email'] ?? null,
             $dados['data_nascimento'] ?? null,
             $dados['endereco'] ?? null,
@@ -119,11 +123,11 @@ class customer {
     }
     
     /**
-     * Verificar se telefone já existe
+     * Verificar se phone já existe
      */
-    public function telefoneExists($telefone, $excludeId = null) {
-        $sql = "SELECT COUNT(*) as total FROM customer WHERE telefone = ? AND active = 1";
-        $params = [$telefone];
+    public function phoneExists($phone, $excludeId = null) {
+        $sql = "SELECT COUNT(*) as total FROM customer WHERE phone = ? AND active = 1";
+        $params = [$phone];
         
         if ($excludeId) {
             $sql .= " AND id != ?";
