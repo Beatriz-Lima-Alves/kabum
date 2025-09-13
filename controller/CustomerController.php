@@ -234,7 +234,7 @@ public function show($id) {
         $this->authController->requireLogin();
         
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: ' . SITE_URL . '/clientes/edit/' . $id);
+            header('Location: ' . SITE_URL . '/edit_cliente/' . $id);
             exit;
         }
         
@@ -243,18 +243,16 @@ public function show($id) {
         
         if (!$customer) {
             $_SESSION['error'] = 'Cliente não encontrado';
-            header('Location: ' . SITE_URL . '/clientes');
+            header('Location: ' . SITE_URL . '/portal');
             exit;
         }
         
         $dados = [
-            'nome' => trim($_POST['name'] ?? ''),
-            'telefone' => preg_replace('/\D/', '', $_POST['phone'] ?? ''),
+            'name' => trim($_POST['name'] ?? ''),
+            'phone' => preg_replace('/\D/', '', $_POST['phone'] ?? ''),
             'email' => filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL),
-            'data_nascimento' => $_POST['date_birth'] ?? null,
-            'endereco' => trim($_POST['endereco'] ?? ''),
-            'observacoes' => trim($_POST['observacoes'] ?? ''),
-            'ativo' => 1
+            'date_birth' => $_POST['date_birth'] ?? null,
+            'active' => 1
         ];
         
         // Validações
@@ -263,16 +261,16 @@ public function show($id) {
         if (!empty($errors)) {
             $_SESSION['error'] = $errors;
             $_SESSION['form_data'] = $dados;
-            header('Location: ' . SITE_URL . '/clientes/edit/' . $id);
+            header('Location: ' . SITE_URL . '/edit_cliente/' . $id);
             exit;
         }
         
         if ($customerModel->update($id, $dados)) {
             $_SESSION['success'] = 'Cliente atualizado com sucesso!';
-            header('Location: ' . SITE_URL . '/clientes/show/' . $id);
+            header('Location: ' . SITE_URL . '/portal');
         } else {
             $_SESSION['error'] = 'Erro ao atualizar cliente';
-            header('Location: ' . SITE_URL . '/clientes/edit/' . $id);
+            header('Location: ' . SITE_URL . '/edit_cliente/' . $id);
         }
         exit;
     }
@@ -335,7 +333,7 @@ public function delete($id) {
             $errors[] = 'Telefone deve ter pelo menos 10 dígitos';
         } else {
             $customerModel = new Customer();
-            if ($customerModel->telefoneExists($dados['phone'], $customerId)) {
+            if ($customerModel->phoneExists($dados['phone'], $customerId)) {
                 $errors[] = 'Este telefone já está cadastrado para outro cliente';
             }
         }

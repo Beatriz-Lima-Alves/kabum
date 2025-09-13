@@ -33,6 +33,8 @@ class Router {
         $this->addRoute('GET', '/portal', [$customerController, 'index']);
         $this->addRoute('GET', '/cliente', [$customerController, 'create']);
         $this->addRoute('POST', '/cliente', [$customerController, 'store']);
+        $this->addRoute('GET', '/edit_cliente/{id}', [$customerController, 'edit']);
+        $this->addRoute('POST', '/update_cliente/{id}', [$customerController, 'update']);
 
     }
 

@@ -90,13 +90,12 @@ class customer {
      * Atualizar cliente
      */
     public function update($id, $dados) {
+
         $sql = "UPDATE customer SET 
                 name = ?, 
                 phone = ?, 
                 email = ?, 
-                data_nascimento = ?, 
-                endereco = ?, 
-                observacoes = ?,
+                date_birth = ?,
                 active = ?
                 WHERE id = ?";
         
@@ -104,9 +103,7 @@ class customer {
             $dados['name'],
             $dados['phone'],
             $dados['email'] ?? null,
-            $dados['data_nascimento'] ?? null,
-            $dados['endereco'] ?? null,
-            $dados['observacoes'] ?? null,
+            $dados['date_birth'] ?? null,
             $dados['active'] ?? 1,
             $id
         ];
@@ -125,11 +122,11 @@ class customer {
     /**
      * Verificar se phone já existe
      */
-    public function phoneExists($phone, $excludeId = null) {
+    public function phoneExists($phone, $excludeId = 0) {
         $sql = "SELECT COUNT(*) as total FROM customer WHERE phone = ? AND active = 1";
         $params = [$phone];
         
-        if ($excludeId) {
+        if ($excludeId >0) {
             $sql .= " AND id != ?";
             $params[] = $excludeId;
         }
