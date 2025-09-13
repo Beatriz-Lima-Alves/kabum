@@ -26,14 +26,13 @@ class CustomerAddress {
      */
     public function update($id, $dados) {
         $sql = "UPDATE customer_address SET 
-                id_customer = ?, 
+                active = ?, 
                 address = ? 
                 WHERE id = ?";
         
         $params = [
-            $dados['id_customer'],
-            $dados['address'],
             $dados['active'] ?? 1,
+            $dados['address'],
             $id
         ];
         
@@ -54,5 +53,12 @@ class CustomerAddress {
         $sql = "UPDATE customer_address SET active = 0 WHERE id_customer = ?";
         return DB::execute($sql, [$id_customer]);
     }
+    /**
+     * Todos os endereços de um cliente
+     */
+    public function getAddresses($customerId) {
+    $sql = "SELECT * FROM customer_address WHERE id_customer = ? and active = 1";
+    return DB::select($sql, [$customerId]);
+}
 }
 ?>

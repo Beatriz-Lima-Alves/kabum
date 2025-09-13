@@ -214,7 +214,11 @@ public function show($id) {
 
         
         $customerModel = new Customer();
+        $customerAddressModel = new CustomerAddress();
+
         $customer = $customerModel->getById($id);
+        $addresses = $customerAddressModel->getAddresses($id);
+
 
         if (!$customer) {
             $_SESSION['error'] = 'Cliente não encontrado';
@@ -239,7 +243,10 @@ public function show($id) {
         }
         
         $customerModel = new Customer();
+        $customerAddressModel = new CustomerAddress();
+
         $customer = $customerModel->getById($id);
+
         
         if (!$customer) {
             $_SESSION['error'] = 'Cliente não encontrado';
@@ -265,6 +272,22 @@ public function show($id) {
             exit;
         }
         
+        if (!empty($_POST['addresses'])) {
+            $customerAddressModel->deactivateAll($id);
+            foreach ($_POST['addresses'] as $addr) {
+                $addressId = $addr['id'];
+                $addressData = [
+                    'address' => $addr['address'],
+                    'id_customer' => $id,
+                    'active' => 1
+                ];
+                if (!empty($addr['id'])) {
+                    $customerAddressModel->update($addressId, $addressData);
+                } else {
+                    $customerAddressModel->create($addressData);
+                }
+            }
+        }
         if ($customerModel->update($id, $dados)) {
             $_SESSION['success'] = 'Cliente atualizado com sucesso!';
             header('Location: ' . SITE_URL . '/portal');

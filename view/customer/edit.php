@@ -123,18 +123,28 @@ include(__DIR__ . '/../layout/header.php');
                                     </div>
                                 </div>
                                 
-                                <!-- <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="endereco" class="form-label">
-                                            <i class="fas fa-map-marker-alt me-1"></i>
-                                            Endereço
-                                        </label>
-                                        <input type="text" name="endereco" id="endereco" class="form-control" 
-                                                value="<?= $customer['endereco'] ?? '' ?>" 
-                                                placeholder="Rua, número, bairro">
-                                    </div>
-                                </div> -->
                             </div>
+                            <label class="form-label">
+                                <i class="fas fa-map-marker-alt me-1"></i>
+                                Endereços
+                            </label>
+                            <div id="enderecos-wrapper">
+                                <?php foreach($addresses as $index => $address): ?>
+                                <div class="input-group mb-2 endereco-row">
+                                    <input type="hidden" name="addresses[<?= $index ?>][id]" value="<?= $address['id'] ?>">
+                                    <input type="text" name="addresses[<?= $index ?>][address]" class="form-control"
+                                        value="<?= $address['address'] ?>" placeholder="Rua, número, bairro, cidade">
+                                    <button type="button" class="btn btn-danger remove-endereco">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                                <?php endforeach; ?>
+                            </div>
+
+                            <button type="button" id="add-endereco" class="btn btn-success btn-sm mt-2">
+                                <i class="fas fa-plus"></i> Adicionar Endereço
+                            </button>
+
                                                                        
                             <div class="d-flex justify-content-end gap-2">
                                 <div>
@@ -276,6 +286,38 @@ function enviarExclusaoViaPOST(id) {
     document.body.appendChild(form);
     form.submit();
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const wrapper = document.getElementById('enderecos-wrapper');
+    const addButton = document.getElementById('add-endereco');
+
+    // Remover endereço
+    wrapper.addEventListener('click', function(e) {
+        if (e.target.closest('.remove-endereco')) {
+            const row = e.target.closest('.endereco-row');
+            row.remove();
+        }
+    });
+
+    // Adicionar novo endereço
+    let index = <?= count($addresses) ?>; // começa do próximo índice
+
+    addButton.addEventListener('click', function() {
+        const row = document.createElement('div');
+        row.classList.add('input-group', 'mb-2', 'endereco-row');
+
+        row.innerHTML = `
+            <input type="hidden" name="addresses[${index}][id]" value="">
+            <input type="text" name="addresses[${index}][address]" class="form-control" placeholder="Rua, número, bairro, cidade">
+            <button type="button" class="btn btn-danger remove-endereco">
+                <i class="fas fa-trash"></i>
+            </button>
+        `;
+
+        wrapper.appendChild(row);
+        index++;
+    });
+});
 </script>
 <?php
 include(__DIR__ . '/../layout/footer.php');
