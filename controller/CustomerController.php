@@ -202,7 +202,9 @@ public function show($id) {
             'phone' => preg_replace('/\D/', '', $_POST['phone'] ?? ''),
             'email' => filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL),
             'date_birth' => $_POST['date_birth'] ?? null,
-            'active' => 1
+            'active' => 1,
+            'cpf' => $_POST['cpf'] ?? null,
+            'rg' => $_POST['rg'] ?? null
         ];
         
         // Validações

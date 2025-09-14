@@ -73,14 +73,16 @@ class customer {
      * Criar novo cliente
      */
     public function create($dados) {
-        $sql = "INSERT INTO customer (name, phone, email, date_birth) 
-                VALUES (?, ?, ?, ?)";
+        $sql = "INSERT INTO customer (name, phone, email, date_birth, cpf, rg) 
+                VALUES (?, ?, ?, ?, ?, ?)";
         
         $params = [
             $dados['name'],
             $dados['phone'],
             $dados['email'] ?? null,
-            $dados['date_birth']
+            $dados['date_birth'],
+            $dados['cpf'],
+            $dados['rg']
         ];
         
         return DB::insert($sql, $params);
@@ -96,7 +98,9 @@ class customer {
                 phone = ?, 
                 email = ?, 
                 date_birth = ?,
-                active = ?
+                active = ?,
+                cpf = ?,
+                rg = ?
                 WHERE id = ?";
         
         $params = [
@@ -105,6 +109,8 @@ class customer {
             $dados['email'] ?? null,
             $dados['date_birth'] ?? null,
             $dados['active'] ?? 1,
+            $dados['cpf'],
+            $dados['rg'],
             $id
         ];
         
