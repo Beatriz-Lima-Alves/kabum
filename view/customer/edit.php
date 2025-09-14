@@ -29,7 +29,7 @@ include(__DIR__ . '/../layout/header.php');
                             <i class="fas fa-arrow-left me-1"></i>
                             Voltar
                         </a>
-                            <a href="/barbearia-new/clientes/show/<?= $customer['id'] ?>" class="btn btn-outline-light">
+                            <a href="<?php echo(SITE_URL.'/detalhes_cliente').'/'. $customer['id'] ?>" class="btn btn-outline-light">
                                 <i class="fas fa-eye me-2"></i>
                                 Ver Detalhes
                             </a>
@@ -133,7 +133,7 @@ include(__DIR__ . '/../layout/header.php');
                                 <div class="input-group mb-2 endereco-row">
                                     <input type="hidden" name="addresses[<?= $index ?>][id]" value="<?= $address['id'] ?>">
                                     <input type="text" name="addresses[<?= $index ?>][address]" class="form-control"
-                                        value="<?= $address['address'] ?>" placeholder="Rua, número, bairro, cidade">
+                                        value="<?= $address['address'] ?>" placeholder="Rua, número, bairro, cidade" required>
                                     <button type="button" class="btn btn-danger remove-endereco">
                                         <i class="fas fa-trash"></i>
                                     </button>
@@ -308,7 +308,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         row.innerHTML = `
             <input type="hidden" name="addresses[${index}][id]" value="">
-            <input type="text" name="addresses[${index}][address]" class="form-control" placeholder="Rua, número, bairro, cidade">
+            <input type="text" name="addresses[${index}][address]" class="form-control" placeholder="Rua, número, bairro, cidade" required>
             <button type="button" class="btn btn-danger remove-endereco">
                 <i class="fas fa-trash"></i>
             </button>

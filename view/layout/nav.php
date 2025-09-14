@@ -8,13 +8,13 @@
                                 Clientes
                             </a>
                         </li>
-                        
-                        <li class="nav-item">
+                        <!-- FUTURA FUNCIONALIDADE -->
+                        <!-- <li class="nav-item">
                             <a class="nav-link <?= $currentPage == 'users' ? 'active' : '' ?>" href="">
                                 <i class="fas fa-user-tie"></i>
                                 Usuários
                             </a>
-                        </li>
+                        </li> -->
 
                         <li class="nav-item logout-section">
                         <a class="nav-link logout-link" href="<?php echo(SITE_URL.'/logout');?>" onclick="return confirm('Tem certeza que deseja sair?');">

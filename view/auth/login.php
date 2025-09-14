@@ -86,7 +86,7 @@ include(__DIR__ . '/../layout/header.php');
                                 <a href="<?php echo(SITE_URL.'/registro');?>">Já possui uma conta?</a>
                             </small>
                             <small class="text-muted">
-                               <a href=""> Esqueceu a senha? </a>
+                               <a href="<?php echo(SITE_URL.'/forgotten_password');?>"> Esqueceu a senha? </a>
                             </small>
                         </div>
                     </div>

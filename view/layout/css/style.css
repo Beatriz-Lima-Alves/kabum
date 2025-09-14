@@ -265,6 +265,31 @@ body {
 .bg-accent{
     background-color: var(--accent-color);
 }
+
+.card-header {
+    background-color: #f8f9fc;
+    border-bottom: 1px solid #e3e6f0;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: #5a5c69;
+    background-color: #f8f9fc;
+}
+
+.table-warning td {
+    background-color: rgba(255, 193, 7, 0.1);
+}
+
+.table-info td {
+    background-color: rgba(13, 202, 240, 0.1);
+}
+
+@media print {
+    .btn, .modal { display: none !important; }
+    .card { border: 1px solid #000 !important; }
+}
 @keyframes float {
     0%, 100% { transform: translateY(0px); }
     50% { transform: translateY(-20px); }

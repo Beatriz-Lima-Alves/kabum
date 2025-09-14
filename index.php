@@ -27,6 +27,10 @@ class Router {
         $userController = new UserController();
         $this->addRoute('GET', '/registro', [$userController, 'create']);
         $this->addRoute('POST', '/registro', [$userController, 'store']);
+        $this->addRoute('GET', '/forgotten_password', [$userController, 'changePassword']);
+        $this->addRoute('POST', '/forgotten_password', [$userController, 'checkUser']);
+        $this->addRoute('GET', '/edit_password/{id}', [$userController, 'editPassword']);
+        $this->addRoute('POST', '/edit_password', [$userController, 'updatePassword']);
 
         //Rotas de cliente
         $customerController = new CustomerController();
@@ -37,6 +41,7 @@ class Router {
         $this->addRoute('POST', '/update_cliente/{id}', [$customerController, 'update']);
         $this->addRoute('DELETE', '/cliente/delete/{id}', [$customerController, 'delete']);
         $this->addRoute('POST', '/cliente/delete/{id}', [$customerController, 'delete']);
+        $this->addRoute('GET', '/detalhes_cliente/{id}', [$customerController, 'show']);
 
     }
 

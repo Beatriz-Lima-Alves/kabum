@@ -65,7 +65,7 @@ class CustomerController {
         $this->authController->requireLogin();
         
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: ' . SITE_URL . '/clientes/create');
+            header('Location: ' . SITE_URL . '/cliente');
             exit;
         }
         
@@ -118,80 +118,23 @@ public function show($id) {
     try {
         // Validar ID
         if (!is_numeric($id) || $id <= 0) {
-            flash('error', 'Cliente não encontrado.');
-            redirect('clientes');
+            $_SESSION['error'] = 'Cliente não encontrado';
+            header('Location: ' . SITE_URL . '/portal');
             return;
         }
 
-        // Buscar cliente usando sua classe DB
-        $customer = DB::selectOne("SELECT * FROM clientes WHERE id = ?", [$id]);
+        $customerModel = new Customer();
+        $customerAddressModel = new CustomerAddress();
+        $customer = $customerModel->getById($id);
 
         if (!$customer) {
-            flash('error', 'Cliente não encontrado.');
-            redirect('clientes');
+            $_SESSION['error'] = 'Cliente não encontrado';
+            header('Location: ' . SITE_URL . '/portal');
             return;
         }
 
-        // Buscar agendamentos do cliente com informações dos serviços e barbeiros
-        $agendamentos = DB::select("
-            SELECT 
-                a.*,
-                s.nome as servico_nome,
-                s.valor as servico_valor,
-                u.nome as barbeiro_nome
-            FROM agendamentos a
-            LEFT JOIN servicos s ON a.servico_id = s.id
-            LEFT JOIN usuarios u ON a.barbeiro_id = u.id
-            WHERE a.cliente_id = ?
-            ORDER BY a.data_agendamento DESC
-        ", [$id]);
+        $addresses = $customerAddressModel->getAddresses($id);
 
-         // Verificar se a consulta retornou dados válidos
-        if ($agendamentos === false) {
-            // logError('Erro na consulta de agendamentos', [
-            //     'cliente_id' => $id,
-            //     'user_id' => $_SESSION['user_id'] ?? null
-            // ]);
-            $agendamentos = []; // Definir como array vazio em caso de erro
-        }
-
-        // Garantir que $agendamentos seja sempre um array
-        if (!is_array($agendamentos)) {
-            $agendamentos = [];
-        }
-
-        // Processar agendamentos para garantir compatibilidade
-        foreach ($agendamentos as &$agendamento) {
-            // Se não tiver valor no agendamento, usar valor do serviço
-            if (empty($agendamento['valor']) && !empty($agendamento['servico_valor'])) {
-                $agendamento['valor'] = $agendamento['servico_valor'];
-            }
-            
-            // Garantir que campos existam
-            $agendamento['servico_nome'] = $agendamento['servico_nome'] ?? 'Serviço não informado';
-            $agendamento['barbeiro_nome'] = $agendamento['barbeiro_nome'] ?? 'Barbeiro não informado';
-        }
-        // Estatísticas do cliente
-        $stats = [
-            'total_agendamentos' => count($agendamentos),
-            'agendamentos_realizados' => count(array_filter($agendamentos, function($a) {
-                return $a['status'] === 'realizado';
-            })),
-            'valor_total_gasto' => array_sum(array_map(function($a) {
-                return ($a['status'] === 'realizado' && !empty($a['valor'])) ? $a['valor'] : 0;
-            }, $agendamentos)),
-            'proximo_agendamento' => $this->getProximoAgendamento($agendamentos)
-        ];
-
-        // Passar dados para a view
-        $data = [
-            'cliente' => $customer,
-            'agendamentos' => $agendamentos,
-            'stats' => $stats
-        ];
-
-        // Incluir a view
-        extract($data);
         include __DIR__ . '/../view/customer/show.php';
 
     } catch (Exception $e) {
@@ -199,9 +142,8 @@ public function show($id) {
             'cliente_id' => $id,
             'user_id' => $_SESSION['user_id'] ?? null
         ]);
-        
-        flash('error', 'Erro interno do sistema. Tente novamente.');
-        redirect('clientes');
+        $_SESSION['error'] = 'Erro interno do sistema. Tente novamente';
+        header('Location: ' . SITE_URL . '/portal');
     }
 }
 
@@ -222,7 +164,7 @@ public function show($id) {
 
         if (!$customer) {
             $_SESSION['error'] = 'Cliente não encontrado';
-            header('Location: ' . SITE_URL . '/clientes');
+            header('Location: ' . SITE_URL . '/cliente');
             exit;
         }
 
