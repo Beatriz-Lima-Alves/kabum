@@ -132,7 +132,7 @@ include(__DIR__ . '/../layout/header.php');
                                                         <i class="fas fa-edit"></i>
                                                     </a>
                                                     <button class="btn btn-outline-danger" 
-                                                            onclick="confirmarExclusao(<?= $customer['id'] ?>)" title="Excluir">
+                                                            onclick="confirmarExclusao(<?= $customer['id'] ?>, '<?php echo SITE_URL; ?>')" title="Excluir">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </div>
@@ -233,7 +233,7 @@ include(__DIR__ . '/../layout/header.php');
 
     <script>
     // Garantir que a função está sempre disponível
-    window.confirmarExclusao = function(id) {
+    window.confirmarExclusao = function(id,SITE_URL) {
         
         if (confirm('Tem certeza que deseja excluir este cliente?\n\nEsta ação não pode ser desfeita.')) {
             
@@ -254,7 +254,7 @@ include(__DIR__ . '/../layout/header.php');
             // Criar formulário para envio
             const form = document.createElement('form');
             form.method = 'POST';
-            form.action = ` ${SITE_URL}/delete_cliente/${id}`;
+            form.action = ` ${SITE_URL}/cliente/delete/${id}`;
             form.style.display = 'none';
             
             // Adicionar método DELETE

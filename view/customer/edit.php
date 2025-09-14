@@ -154,7 +154,7 @@ include(__DIR__ . '/../layout/header.php');
                                     </a>
                                 </div>
                                 <div>
-                                    <button type="button" class="btn btn-danger me-2" onclick="confirmarExclusao(<?php echo $id; ?>)">
+                                    <button type="button" class="btn btn-danger me-2" onclick="confirmarExclusao(<?php echo $id; ?>, '<?php echo SITE_URL; ?>')">
                                         <i class="fas fa-trash me-1"></i>
                                         Excluir Cliente
                                     </button>
@@ -217,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-function confirmarExclusao(id) {
+function confirmarExclusao(id,SITE_URL) {
     if (confirm('Tem certeza que deseja excluir este cliente?\n\nEsta ação não pode ser desfeita.')) {
         
         // Mostrar loading
@@ -227,7 +227,7 @@ function confirmarExclusao(id) {
         button.disabled = true;
         
         // Tentar primeiro com fetch DELETE
-        fetch(`/barbearia-new/clientes/delete/${id}`, {
+        fetch(`${SITE_URL}/cliente/delete/${id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -240,7 +240,7 @@ function confirmarExclusao(id) {
                 window.location.reload();
             } else if (response.status === 404) {
                 // Se DELETE não funcionar, tentar POST
-                enviarExclusaoViaPOST(id);
+                enviarExclusaoViaPOST(id,SITE_URL);
             } else {
                 throw new Error('Erro na exclusão');
             }
@@ -248,7 +248,7 @@ function confirmarExclusao(id) {
         .catch(error => {
             console.log('Fetch falhou, tentando POST...', error);
             // Fallback: usar POST
-            enviarExclusaoViaPOST(id);
+            enviarExclusaoViaPOST(id,SITE_URL);
         })
         .finally(() => {
             // Restaurar botão
@@ -258,11 +258,11 @@ function confirmarExclusao(id) {
     }
 }
 
-function enviarExclusaoViaPOST(id) {
+function enviarExclusaoViaPOST(id,SITE_URL) {
     // Criar formulário oculto
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = `/barbearia-new/clientes/delete/${id}`;
+    form.action = `${SITE_URL}/cliente/delete/${id}`;
     form.style.display = 'none';
     
     // Adicionar token CSRF se necessário

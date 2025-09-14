@@ -35,6 +35,8 @@ class Router {
         $this->addRoute('POST', '/cliente', [$customerController, 'store']);
         $this->addRoute('GET', '/edit_cliente/{id}', [$customerController, 'edit']);
         $this->addRoute('POST', '/update_cliente/{id}', [$customerController, 'update']);
+        $this->addRoute('DELETE', '/cliente/delete/{id}', [$customerController, 'delete']);
+        $this->addRoute('POST', '/cliente/delete/{id}', [$customerController, 'delete']);
 
     }
 

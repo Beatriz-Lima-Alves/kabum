@@ -226,7 +226,6 @@ public function show($id) {
             exit;
         }
 
-        // var_dump($customer_edit);exit();
         
         include __DIR__ . '/../view/customer/edit.php';
     }
@@ -302,30 +301,17 @@ public function show($id) {
      * Desativa cliente 
      */
 public function delete($id) {
-        $this->authController->requireAdmin();
+        $this->authController->requireLogin();
         
         $customerModel = new Customer();
         $customer = $customerModel->getById($id);
         
         if (!$customer) {
             $_SESSION['error'] = 'Cliente não encontrado';
-            header('Location: ' . SITE_URL . '/clientes');
+            header('Location: ' . SITE_URL . '/portal');
             exit;
         }
         
-        // Verificar se tem agendamentos futuros
-        $agendamentoModel = new Agendamento();
-        $agendamentosFuturos = $agendamentoModel->getAll([
-            'cliente_id' => $id,
-            'data_inicio' => date('Y-m-d'),
-            'status' => 'agendado'
-        ]);
-        
-        if (!empty($agendamentosFuturos)) {
-            $_SESSION['error'] = 'Não é possível desativar cliente com agendamentos futuros';
-            header('Location: ' . SITE_URL . '/clientes/show/' . $id);
-            exit;
-        }
         
         if ($customerModel->deactivate($id)) {
             $_SESSION['success'] = 'Cliente desativado com sucesso!';
@@ -333,7 +319,7 @@ public function delete($id) {
             $_SESSION['error'] = 'Erro ao desativar cliente';
         }
         
-        header('Location: ' . SITE_URL . '/clientes');
+        header('Location: ' . SITE_URL . '/portal');
         exit;
     }
     /**
