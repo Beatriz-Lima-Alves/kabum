@@ -7,7 +7,7 @@ define('DB_PASS', '');
 define('DB_CHARSET', 'utf8mb4');
 
 // Configurações gerais
-define('SITE_URL', 'http://localhost/Kabum-original');
+define('SITE_URL', 'http://localhost/kabum');
 define('SITE_NAME', 'Sistema de Gerenciamento de Clientes');
 define('DEFAULT_TIMEZONE', 'America/Sao_Paulo');
 

@@ -77,9 +77,6 @@ include(__DIR__ . '/../layout/header.php');
                             <a href="tel:<?= $customer['phone'] ?>" class="text-decoration-none">
                                 <?= $customer['phone'] ?>
                             </a>
-                            <button class="btn btn-sm btn-outline-success ms-2" onclick="copyToClipboard('<?= $customer['phone'] ?>')">
-                                <i class="fas fa-copy"></i>
-                            </button>
                         </div>
                     </div>
 
@@ -178,89 +175,6 @@ include(__DIR__ . '/../layout/header.php');
 </div>
 
 <script>
-// Função para copiar texto
-function copyToClipboard(text) {
-    navigator.clipboard.writeText(text).then(function() {
-        // Se tiver SweetAlert carregado
-        if (typeof Swal !== 'undefined') {
-            const Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 2000,
-                timerProgressBar: true,
-            });
-            
-            Toast.fire({
-                icon: 'success',
-                title: 'Telefone copiado!'
-            });
-        } else {
-            // Fallback para alert simples
-            alert('Telefone copiado: ' + formatPhone(text));
-        }
-    }).catch(function(err) {
-        console.error('Erro ao copiar: ', err);
-        alert('Erro ao copiar o telefone');
-    });
-}
-
-// Confirmar exclusão
-function confirmarExclusao() {
-    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
-    modal.show();
-}
-
-// Confirmar agendamento via AJAX
-function confirmarAgendamento(agendamentoId) {
-    if (confirm('Confirmar este agendamento?')) {
-        fetch(`<?= url('api/agendamentos/') ?>${agendamentoId}/confirmar`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Erro ao confirmar agendamento: ' + (data.message || 'Erro desconhecido'));
-            }
-        })
-        .catch(error => {
-            console.error('Erro:', error);
-            alert('Erro de conexão');
-        });
-    }
-}
-
-// Imprimir histórico
-function imprimirHistorico() {
-    window.print();
-}
-
-// Exportar para CSV
-function exportarCSV() {
-    window.location.href = `<?= url('clientes/' . $customer['id'] . '/export-csv') ?>`;
-}
-
-// Formatação de telefone no JavaScript (compatibilidade)
-function formatPhone(phone) {
-    if (!phone) return '';
-    
-    const cleaned = phone.replace(/\D/g, '');
-    
-    if (cleaned.length === 11) {
-        return `(${cleaned.substr(0, 2)}) ${cleaned.substr(2, 5)}-${cleaned.substr(7)}`;
-    } else if (cleaned.length === 10) {
-        return `(${cleaned.substr(0, 2)}) ${cleaned.substr(2, 4)}-${cleaned.substr(6)}`;
-    }
-    
-    return phone;
-}
-
 // Auto-hide alerts
 document.addEventListener('DOMContentLoaded', function() {
     // Esconder alertas automaticamente após 5 segundos
