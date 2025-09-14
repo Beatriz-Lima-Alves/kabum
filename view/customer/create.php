@@ -93,6 +93,25 @@ include(__DIR__ . '/../layout/header.php');
                                 <input type="date" class="form-control" id="date_birth" name="date_birth">
                             </div>
                         </div>
+
+                         <!-- CPF e RG -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="cpf" class="form-label">
+                                    <i class="fas fa-envelope me-1"></i>
+                                    CPF *
+                                </label>
+                                 <input type="text" class="form-control" id="cpf" name="cpf" placeholder="000.000.000-00" maxlength="14" required/>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="date_birth" class="form-label">
+                                    <i class="fas fa-birthday-cake me-1"></i>
+                                    RG *
+                                </label>
+                                <input class="form-control" id="rg" name="rg" type="text" inputmode="numeric" placeholder="00.000.000-0" maxlength="12" required/>
+                            </div>
+                        </div>
                         
                         <!-- Endereços -->
                         <div class="mb-3">

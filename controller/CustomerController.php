@@ -73,7 +73,9 @@ class CustomerController {
             'name' => trim($_POST['name'] ?? ''),
             'phone' => preg_replace('/\D/', '', $_POST['phone'] ?? ''),
             'email' => filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL),
-            'date_birth' => $_POST['date_birth'] ?? null
+            'date_birth' => $_POST['date_birth'] ?? null,
+            'cpf' => $_POST['cpf'] ?? null,
+            'rg' => $_POST['rg'] ?? null
         ];
         
         // Validações
@@ -269,6 +271,17 @@ public function delete($id) {
      */
     private function validateCliente($dados, $customerId = null) {
         $errors = [];
+        // CPF obrigatório
+        if (empty($dados['cpf'])) {
+            $errors[] = 'CPF é obrigatório';
+        } elseif (!($this->validateCPF($dados['cpf']))) {
+            $errors[] = 'CPF Inválido';
+        }
+        
+        // RG obrigatório
+        if (empty($dados['rg'])) {
+            $errors[] = 'RG é obrigatório';
+        } 
         
         // Nome obrigatório
         if (empty($dados['name'])) {
@@ -314,6 +327,35 @@ public function delete($id) {
         }
         
         return $errors;
+    }
+
+    public function validateCPF ($cpf){
+
+        $cpf = preg_replace('/\D/', '', $cpf);
+
+        if (strlen($cpf) != 11) {
+            return false;
+        }
+
+        if (preg_match('/^(\d)\1{10}$/', $cpf)) {
+            return false;
+        }
+
+        for ($t = 9; $t < 11; $t++) {
+            $soma = 0;
+            for ($i = 0; $i < $t; $i++) {
+                $soma += $cpf[$i] * (($t + 1) - $i);
+            }
+            $digito = ($soma * 10) % 11;
+            if ($digito == 10) {
+                $digito = 0;
+            }
+            if ($digito != $cpf[$t]) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 }
