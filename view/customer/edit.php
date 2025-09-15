@@ -265,7 +265,6 @@ function confirmarExclusao(id,SITE_URL) {
             }
         })
         .catch(error => {
-            console.log('Fetch falhou, tentando POST...', error);
             // Fallback: usar POST
             enviarExclusaoViaPOST(id,SITE_URL);
         })
