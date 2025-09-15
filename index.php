@@ -88,7 +88,6 @@ class Router {
                         }
                     }
                 }
-                 // Chamar callback
                 return $this->callCallback($route['callback'], $params);
 
             }
