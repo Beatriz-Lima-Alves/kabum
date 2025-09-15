@@ -216,7 +216,7 @@ include(__DIR__ . '/../layout/header.php');
                         <div class="mb-3">
                             <label class="form-label">Buscar por</label>
                             <input type="text" name="search" class="form-control" 
-                                   placeholder="Nome, telefone ou email..."
+                                   placeholder="Nome, telefone, email, cpf ou rg ..."
                                    value="<?= $_GET['search'] ?? '' ?>">
                         </div>
                         

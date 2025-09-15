@@ -44,8 +44,10 @@ class customer {
         }
         
         if ($search) {
-            $conditions[] = "(name LIKE ? OR phone LIKE ? OR email LIKE ?)";
+            $conditions[] = "(name LIKE ? OR phone LIKE ? OR email LIKE ? or cpf like ? or rg like ?)";
             $searchTerm = "%$search%";
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
             $params[] = $searchTerm;
             $params[] = $searchTerm;
             $params[] = $searchTerm;
