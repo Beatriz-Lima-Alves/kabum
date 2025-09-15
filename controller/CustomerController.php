@@ -117,6 +117,7 @@ class CustomerController {
  * Exibir detalhes de um cliente específico
  */
 public function show($id) {
+    $this->authController->requireLogin();
     try {
         // Validar ID
         if (!is_numeric($id) || $id <= 0) {
@@ -246,7 +247,7 @@ public function show($id) {
     /**
      * Desativa cliente 
      */
-public function delete($id) {
+    public function delete($id) {
         $this->authController->requireLogin();
         
         $customerModel = new Customer();
