@@ -4,7 +4,7 @@ require_once __DIR__ . '/../config/database.php';
 /**
  * Model para customer
  */
-class Customer {
+class customer {
     
     /**
      * Buscar cliente por ID
@@ -15,11 +15,11 @@ class Customer {
     }
     
     /**
-     * Buscar cliente por telefone
+     * Buscar cliente por phone
      */
-    public function getByTelefone($telefone) {
-        $sql = "SELECT * FROM customer WHERE telefone = ? AND active = 1";
-        return DB::selectOne($sql, [$telefone]);
+    public function getByphone($phone) {
+        $sql = "SELECT * FROM customer WHERE phone = ? AND active = 1";
+        return DB::selectOne($sql, [$phone]);
     }
     
     /**
@@ -33,7 +33,7 @@ class Customer {
     /**
      * Listar todos os customer
      */
-    public function getAll($active = null, $limit = null, $search = null) {
+    public function getAll($active = null, $limit = null, $search = null, $offset = null) {
         $sql = "SELECT * FROM customer";
         $params = [];
         $conditions = [];
@@ -44,8 +44,10 @@ class Customer {
         }
         
         if ($search) {
-            $conditions[] = "(nome LIKE ? OR telefone LIKE ? OR email LIKE ?)";
+            $conditions[] = "(name LIKE ? OR phone LIKE ? OR email LIKE ? or cpf like ? or rg like ?)";
             $searchTerm = "%$search%";
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
             $params[] = $searchTerm;
             $params[] = $searchTerm;
             $params[] = $searchTerm;
@@ -55,11 +57,15 @@ class Customer {
             $sql .= " WHERE " . implode(" AND ", $conditions);
         }
         
-        $sql .= " ORDER BY nome";
+        $sql .= " ORDER BY name";
         
         if ($limit) {
             $sql .= " LIMIT ?";
             $params[] = $limit;
+            if ($offset !== null) {
+                $sql .= " OFFSET ?";
+                $params[] = (int)$offset;
+            }
         }
         
         return DB::select($sql, $params);
@@ -69,16 +75,16 @@ class Customer {
      * Criar novo cliente
      */
     public function create($dados) {
-        $sql = "INSERT INTO customer (nome, telefone, email, data_nascimento, endereco, observacoes) 
+        $sql = "INSERT INTO customer (name, phone, email, date_birth, cpf, rg) 
                 VALUES (?, ?, ?, ?, ?, ?)";
         
         $params = [
-            $dados['nome'],
-            $dados['telefone'],
+            $dados['name'],
+            $dados['phone'],
             $dados['email'] ?? null,
-            $dados['data_nascimento'] ?? null,
-            $dados['endereco'] ?? null,
-            $dados['observacoes'] ?? null
+            $dados['date_birth'],
+            $dados['cpf'],
+            $dados['rg']
         ];
         
         return DB::insert($sql, $params);
@@ -88,24 +94,25 @@ class Customer {
      * Atualizar cliente
      */
     public function update($id, $dados) {
+
         $sql = "UPDATE customer SET 
-                nome = ?, 
-                telefone = ?, 
+                name = ?, 
+                phone = ?, 
                 email = ?, 
-                data_nascimento = ?, 
-                endereco = ?, 
-                observacoes = ?,
-                active = ?
+                date_birth = ?,
+                active = ?,
+                cpf = ?,
+                rg = ?
                 WHERE id = ?";
         
         $params = [
-            $dados['nome'],
-            $dados['telefone'],
+            $dados['name'],
+            $dados['phone'],
             $dados['email'] ?? null,
-            $dados['data_nascimento'] ?? null,
-            $dados['endereco'] ?? null,
-            $dados['observacoes'] ?? null,
+            $dados['date_birth'] ?? null,
             $dados['active'] ?? 1,
+            $dados['cpf'],
+            $dados['rg'],
             $id
         ];
         
@@ -121,19 +128,23 @@ class Customer {
     }
     
     /**
-     * Verificar se telefone já existe
+     * Verificar se phone já existe
      */
-    public function telefoneExists($telefone, $excludeId = null) {
-        $sql = "SELECT COUNT(*) as total FROM customer WHERE telefone = ? AND active = 1";
-        $params = [$telefone];
+    public function phoneExists($phone, $excludeId = 0) {
+        $sql = "SELECT COUNT(*) as total FROM customer WHERE phone = ? AND active = 1";
+        $params = [$phone];
         
-        if ($excludeId) {
+        if ($excludeId >0) {
             $sql .= " AND id != ?";
             $params[] = $excludeId;
         }
         
         $result = DB::selectOne($sql, $params);
-        return $result['total'] > 0;
+        if ($result && isset($result['total'])) {
+            return $result['total'] > 0;
+        }
+
+        return false;
     }
     
     /**
@@ -154,20 +165,6 @@ class Customer {
         return $result['total'] > 0;
     }
     
-    /**
-     * Obter histórico de agendamentos do cliente
-     */
-    public function getHistoricoAgendamentos($clienteId, $limit = 10) {
-        $sql = "SELECT a.*, s.nome as servico, u.nome as barbeiro 
-                FROM agendamentos a
-                JOIN servicos s ON a.servico_id = s.id
-                JOIN usuarios u ON a.barbeiro_id = u.id
-                WHERE a.cliente_id = ?
-                ORDER BY a.data_agendamento DESC, a.hora_agendamento DESC
-                LIMIT ?";
-        
-        return DB::select($sql, [$clienteId, $limit]);
-    }
     
     /**
      * Contar total de customer
@@ -178,34 +175,6 @@ class Customer {
         return $result['total'];
     }
     
-    /**
-     * Obter customer mais frequentes
-     */
-    public function getMaisFrequentes($limit = 5) {
-        $sql = "SELECT c.*, COUNT(a.id) as total_agendamentos
-                FROM customer c
-                LEFT JOIN agendamentos a ON c.id = a.cliente_id
-                WHERE c.active = 1
-                GROUP BY c.id
-                ORDER BY total_agendamentos DESC
-                LIMIT ?";
-        
-        return DB::select($sql, [$limit]);
-    }
     
-    /**
-     * Obter aniversariantes do mês
-     */
-    public function getAniversariantesDoMes($mes = null) {
-        if (!$mes) {
-            $mes = date('m');
-        }
-        
-        $sql = "SELECT * FROM customer 
-                WHERE MONTH(data_nascimento) = ? AND active = 1
-                ORDER BY DAY(data_nascimento)";
-        
-        return DB::select($sql, [$mes]);
-    }
 }
 ?>

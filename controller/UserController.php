@@ -31,7 +31,7 @@ class UserController {
      */
     public function store() {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: ' . SITE_URL . '/usuarios');
+            header('Location: ' . SITE_URL . '/registro');
             exit;
         }
         
@@ -46,7 +46,7 @@ class UserController {
         $errors = $this->validateUsuario($dados);
         
         if (!empty($errors)) {
-            $_SESSION['errors'] = $errors;
+            $_SESSION['error'] = $errors;
             $_SESSION['form_data'] = $dados;
             header('Location: ' . SITE_URL . '/login');
             exit;
@@ -117,7 +117,7 @@ class UserController {
         $errors = $this->validateUsuarioUpdate($dados, $id);
         
         if (!empty($errors)) {
-            $_SESSION['errors'] = $errors;
+            $_SESSION['error'] = $errors;
             $_SESSION['form_data'] = $dados;
             header('Location: ' . SITE_URL . '/usuarios/edit/' . $id);
             exit;
@@ -136,82 +136,102 @@ class UserController {
     }
     
     /**
+     * Exibe formulário de verificação de email
+     */
+    public function changePassword() {
+
+        include __DIR__ . '/../view/user/change_password.php';
+        
+    }
+    
+    
+    /**
      * Exibe formulário de alteração de senha
      */
-    public function changePassword($id) {
-                       
-        $userModel = new User();
-        $user = $userModel->getById($id);
-        
-        if (!$user) {
-            $_SESSION['error'] = 'Usuário não encontrado';
-            header('Location: ' . SITE_URL . '/usuarios');
-            exit;
-        }
-        
-        include __DIR__ . '/../view/user/change_password.php';
+    public function editPassword($id) {
+        include __DIR__ . '/../view/user/edit_password.php';
     }
     
     /**
      * Processa alteração de senha
      */
-    public function updatePassword($id) {
+    public function checkUser() {
                 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: ' . SITE_URL . '/usuarios/change-password/' . $id);
+            header('Location: ' . SITE_URL . '/forgotten_password');
             exit;
         }
-        
         $userModel = new User();
-        $user = $userModel->getById($id);
+        $user = $userModel->getByEmail($_POST['email']);
         
         if (!$user) {
             $_SESSION['error'] = 'Usuário não encontrado';
-            header('Location: ' . SITE_URL . '/usuarios');
+            header('Location: ' . SITE_URL . '/login');
             exit;
         }
-        
-        $passwordActual = $_POST['senha_atual'] ?? '';
-        $newPassword = $_POST['nova_senha'] ?? '';
-        $confirmarSenha = $_POST['confirmar_senha'] ?? '';
-        
-        $errors = [];
-        
-        // Se não for admin, verificar senha atual
-        if (empty($passwordActual)) {
-            $errors[] = 'Senha atual é obrigatória';
-        } elseif (!password_verify($passwordActual, $user['senha'])) {
-            $errors[] = 'Senha atual incorreta';
+        else{
+            header('Location: ' . SITE_URL . '/edit_password/'.$user['id']);
+            exit;
+            
         }
-        
-        
-        // Validar nova senha
-        if (empty($newPassword)) {
+    }
+    
+    public function updatePassword(){
+        if (empty($_POST['id'])) {
+            $_SESSION['error'] = 'Usuário inválido';
+            header('Location: ' . SITE_URL . '/login');
+            exit;
+        }
+
+        $userModel = new User();
+        $user = $userModel->getById($_POST['id']);
+
+        // 2. Verifica se token é válido e não expirou
+        if (!$user) {
+            $_SESSION['error'] = 'Usuário inválido ou desativado';
+            header('Location: ' . SITE_URL . '/login');
+            exit;
+        }
+
+        // 3. Verifica se o formulário foi enviado
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . SITE_URL . '/forgotten_password');
+            exit;
+        }
+
+        $newPassword = $_POST['senha'] ?? '';
+        $confirmPassword = $_POST['confirma_senha'] ?? '';
+        $errors = [];
+
+        // 4. Valida nova senha
+        if (empty($newPassword) || $newPassword == "") {
             $errors[] = 'Nova senha é obrigatória';
         } elseif (strlen($newPassword) < 6) {
             $errors[] = 'Nova senha deve ter pelo menos 6 caracteres';
         }
-        
-        if ($newPassword !== $confirmarSenha) {
+
+        if ($newPassword !== $confirmPassword) {
             $errors[] = 'Confirmação de senha não confere';
         }
-        
+
         if (!empty($errors)) {
-            $_SESSION['errors'] = $errors;
-            header('Location: ' . SITE_URL . '/usuarios/change-password/' . $id);
+            $_SESSION['error'] = $errors;
+            header('Location: ' . SITE_URL . '/edit_password/'.$_POST['id']);
             exit;
         }
-        
-        if ($userModel->updatePassword($id, $newPassword)) {
-            $_SESSION['success'] = 'Senha alterada com sucesso!';
-            header('Location: ' . SITE_URL . '/usuarios/show/' . $id);
+
+        if ($userModel->updatePassword($user['id'], $newPassword)) {
+
+            $_SESSION['success'] = 'Senha redefinida com sucesso!';
+            header('Location: ' . SITE_URL . '/login');
         } else {
-            $_SESSION['error'] = 'Erro ao alterar senha';
-            header('Location: ' . SITE_URL . '/usuarios/change-password/' . $id);
+            $_SESSION['error'] = 'Erro ao redefinir senha';
+            header('Location: ' . SITE_URL . '/edit_password/'.$_POST['id']);
         }
-        exit;
+
     }
-    
+
+
     /**
      * Desativa usuário (Para funcionalidade futura)
      */

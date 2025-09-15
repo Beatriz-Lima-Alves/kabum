@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../config/database.php';
 
 /**
- * Model para gerenciamento de usuários (barbeiros e administradores)
+ * Model para gerenciamento de usuários
  */
 class User {
     
@@ -92,7 +92,7 @@ class User {
     }
     
     /**
-     * Desativa usuário (soft delete)
+     * Desativa usuário
      */
     public function delete($id) {
         $sql = "UPDATE users SET active = 0 WHERE id = ?";
@@ -149,7 +149,7 @@ class User {
     }
 
      /**
-     * Verificar se email já existe (excluindo um ID específico)
+     * Verificar se email já existe (excluindo um ID específico) - Funcionalidade futura
      */
     public function emailExiste($email, $excluirId = null) {
         try {

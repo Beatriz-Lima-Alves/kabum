@@ -3,47 +3,23 @@ $title = 'Portal';
 $currentPage = 'customer';
 
 // Garantir que as variáveis existam
-$customers = $customers ?? [];
+$customers = $dados['customers'];
 
-$paginacao = $paginacao ?? null;
+$paginacao = $dados ?? null;
 
 include(__DIR__ . '/../layout/header.php');
 
 ?>
    
-    <div class="container-fluid pt-2">
+    <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
-            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
-                <div class="position-sticky pt-3">
-                    <ul class="nav flex-column">
-                                                
-                        <li class="nav-item">
-                            <a class="nav-link <?= $currentPage == 'customer' ? 'active' : '' ?>" href="<?php echo(SITE_URL.'/portal');?>">
-                                <i class="fas fa-users"></i>
-                                Clientes
-                            </a>
-                        </li>
-                        
-                        <li class="nav-item">
-                            <a class="nav-link <?= $currentPage == 'users' ? 'active' : '' ?>" href="">
-                                <i class="fas fa-user-tie"></i>
-                                Usuários
-                            </a>
-                        </li>
-
-                        <li class="nav-item logout-section">
-                        <a class="nav-link logout-link" href="<?php echo(SITE_URL.'/logout');?>" onclick="return confirm('Tem certeza que deseja sair?');">
-                            <i class="fas fa-sign-out-alt"></i>
-                            Sair
-                        </a>
-                    </li>
-                    </ul>
-                </div>
-            </nav>
+            <?php
+                include(__DIR__ . '/../layout/nav.php');
+            ?>
 
             <!-- Main content -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content pt-4">
                 <!-- Mensagens -->
                 <?php if (isset($_SESSION['success'])): ?>
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -116,22 +92,19 @@ include(__DIR__ . '/../layout/header.php');
                                         <tr>
                                             <td>
                                                 <div class="d-flex align-items-center">
-                                                    <div class="avatar-circle bg-primary text-white me-3">
+                                                    <div class="avatar-circle bg-accent text-white me-3">
                                                         <?= strtoupper(substr($customer['name'], 0, 2)) ?>
                                                     </div>
                                                     <div>
-                                                        <div class="fw-bold"><?= e($customer['name']) ?></div>
+                                                        <div class="fw-bold"><?= $customer['name'] ?></div>
                                                         <?php if (!empty($customer['email'])): ?>
-                                                            <small class="text-muted"><?= e($customer['email']) ?></small>
+                                                            <small class="text-muted"><?= $customer['email'] ?></small>
                                                         <?php endif; ?>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td>
-                                                <div><?= e($customer['phone']) ?></div>
-                                                <!-- <?php if (!empty($customer['endereco'])): ?>
-                                                    <small class="text-muted"><?= e($customer['endereco']) ?></small>
-                                                <?php endif; ?> -->
+                                                <div><?= $customer['phone'] ?></div>
                                             </td>
                                             <td>
                                                 <?php if (!empty($customer['date_birth']) && $customer['date_birth'] !== '0000-00-00'): ?>
@@ -159,7 +132,7 @@ include(__DIR__ . '/../layout/header.php');
                                                         <i class="fas fa-edit"></i>
                                                     </a>
                                                     <button class="btn btn-outline-danger" 
-                                                            onclick="confirmarExclusao(<?= $customer['id'] ?>)" title="Excluir">
+                                                            onclick="confirmarExclusao(<?= $customer['id'] ?>, '<?php echo SITE_URL; ?>')" title="Excluir">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </div>
@@ -169,31 +142,60 @@ include(__DIR__ . '/../layout/header.php');
                                     </tbody>
                                 </table>
                             </div>
-                            
+                           
+                            <div class="d-flex justify-content-between align-items-center mt-4 flex-wrap">
+                            <!-- Escolha de itens por página -->
+                            <form method="get" class="d-flex align-items-center mb-2 mb-md-0">
+                                <label for="limit" class="me-2 mb-0">Itens por página:</label>
+                                <select name="limit" id="limit" class="form-select w-auto" onchange="this.form.submit()">
+                                    <?php 
+                                        $opcoes = [5, 10, 20, 50, 100];
+                                        foreach ($opcoes as $op) : 
+                                    ?>
+                                        <option value="<?= $op ?>" <?= $op == $paginacao['limit'] ? 'selected' : '' ?>>
+                                            <?= $op ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <input type="hidden" name="page" value="1">
+                                <?php if (!empty($paginacao['search'])): ?>
+                                    <input type="hidden" name="search" value="<?= htmlspecialchars($paginacao['search']) ?>">
+                                <?php endif; ?>
+                            </form>
+
                             <!-- Paginação -->
-                            <?php if (isset($paginacao) && $paginacao['total_page'] > 1): ?>
-                            <nav class="mt-4">
-                                <ul class="pagination justify-content-center">
-                                    <?php if ($paginacao['page'] > 1): ?>
-                                        <li class="page-item">
-                                            <a class="page-link" href="?pagina=<?= $paginacao['page'] - 1 ?>">Anterior</a>
-                                        </li>
-                                    <?php endif; ?>
-                                    
-                                    <?php for ($i = 1; $i <= $paginacao['total_page']; $i++): ?>
-                                        <li class="page-item <?= $i == $paginacao['page'] ? 'active' : '' ?>">
-                                            <a class="page-link" href="?pagina=<?= $i ?>"><?= $i ?></a>
-                                        </li>
-                                    <?php endfor; ?>
-                                    
-                                    <?php if ($paginacao['page'] < $paginacao['total_page']): ?>
-                                        <li class="page-item">
-                                            <a class="page-link" href="?pagina=<?= $paginacao['page'] + 1 ?>">Próximo</a>
-                                        </li>
-                                    <?php endif; ?>
-                                </ul>
-                            </nav>
+                            <?php if ($paginacao['total_page'] > 1): ?>
+                                <nav>
+                                    <ul class="pagination mb-0">
+                                        <?php if ($paginacao['page'] > 1): ?>
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page=<?= $paginacao['page'] - 1 ?>&limit=<?= $paginacao['limit'] ?><?= !empty($paginacao['search']) ? '&search=' . urlencode($paginacao['search']) : '' ?>">
+                                                    Anterior
+                                                </a>
+                                            </li>
+                                        <?php endif; ?>
+
+                                        <?php for ($i = 1; $i <= $paginacao['total_page']; $i++): ?>
+                                            <li class="page-item <?= $i == $paginacao['page'] ? 'active' : '' ?>">
+                                                <a class="page-link" href="?page=<?= $i ?>&limit=<?= $paginacao['limit'] ?><?= !empty($paginacao['search']) ? '&search=' . urlencode($paginacao['search']) : '' ?>">
+                                                    <?= $i ?>
+                                                </a>
+                                            </li>
+                                        <?php endfor; ?>
+
+                                        <?php if ($paginacao['page'] < $paginacao['total_page']): ?>
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page=<?= $paginacao['page'] + 1 ?>&limit=<?= $paginacao['limit'] ?><?= !empty($paginacao['search']) ? '&search=' . urlencode($paginacao['search']) : '' ?>">
+                                                    Próximo
+                                                </a>
+                                            </li>
+                                        <?php endif; ?>
+                                    </ul>
+                                </nav>
                             <?php endif; ?>
+                        </div>
+
+
                         <?php endif; ?>
                     </div>
                 </div>
@@ -213,9 +215,9 @@ include(__DIR__ . '/../layout/header.php');
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Buscar por</label>
-                            <input type="text" name="busca" class="form-control" 
-                                   placeholder="Nome, telefone ou email..."
-                                   value="<?= $_GET['busca'] ?? '' ?>">
+                            <input type="text" name="search" class="form-control" 
+                                   placeholder="Nome, telefone, email, cpf ou rg ..."
+                                   value="<?= $_GET['search'] ?? '' ?>">
                         </div>
                         
                     </div>
@@ -231,7 +233,7 @@ include(__DIR__ . '/../layout/header.php');
 
     <script>
     // Garantir que a função está sempre disponível
-    window.confirmarExclusao = function(id) {
+    window.confirmarExclusao = function(id,SITE_URL) {
         
         if (confirm('Tem certeza que deseja excluir este cliente?\n\nEsta ação não pode ser desfeita.')) {
             
@@ -252,7 +254,7 @@ include(__DIR__ . '/../layout/header.php');
             // Criar formulário para envio
             const form = document.createElement('form');
             form.method = 'POST';
-            form.action = ` ${SITE_URL}/delete_cliente/${id}`;
+            form.action = ` ${SITE_URL}/cliente/delete/${id}`;
             form.style.display = 'none';
             
             // Adicionar método DELETE
@@ -302,22 +304,6 @@ include(__DIR__ . '/../layout/header.php');
             });
         }, 5000);
         
-        // Verificar se as funções estão funcionando
-        
-        
-        // Adicionar event listeners extras para debug
-        const deleteButtons = document.querySelectorAll('button[onclick*="confirmarExclusao"]');
-        
-        
-        deleteButtons.forEach((button, index) => {
-            
-            
-            // Adicionar evento de click extra para teste
-            button.addEventListener('click', function(e) {
-                
-                
-            });
-        });
     });
     </script>
 

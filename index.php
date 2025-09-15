@@ -27,12 +27,21 @@ class Router {
         $userController = new UserController();
         $this->addRoute('GET', '/registro', [$userController, 'create']);
         $this->addRoute('POST', '/registro', [$userController, 'store']);
+        $this->addRoute('GET', '/forgotten_password', [$userController, 'changePassword']);
+        $this->addRoute('POST', '/forgotten_password', [$userController, 'checkUser']);
+        $this->addRoute('GET', '/edit_password/{id}', [$userController, 'editPassword']);
+        $this->addRoute('POST', '/edit_password', [$userController, 'updatePassword']);
 
         //Rotas de cliente
         $customerController = new CustomerController();
         $this->addRoute('GET', '/portal', [$customerController, 'index']);
         $this->addRoute('GET', '/cliente', [$customerController, 'create']);
         $this->addRoute('POST', '/cliente', [$customerController, 'store']);
+        $this->addRoute('GET', '/edit_cliente/{id}', [$customerController, 'edit']);
+        $this->addRoute('POST', '/update_cliente/{id}', [$customerController, 'update']);
+        $this->addRoute('DELETE', '/cliente/delete/{id}', [$customerController, 'delete']);
+        $this->addRoute('POST', '/cliente/delete/{id}', [$customerController, 'delete']);
+        $this->addRoute('GET', '/detalhes_cliente/{id}', [$customerController, 'show']);
 
     }
 

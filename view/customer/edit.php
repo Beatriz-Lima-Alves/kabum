@@ -1,304 +1,35 @@
 <?php
-/**
- * VIEW DE EDIÇÃO DE CLIENTES - VERSÃO FUNCIONAL
- * Salvar como: C:\xampp\htdocs\barbearia-new\app\views\clientes\edit.php
- * 
- * Esta versão funciona tanto na versão simplificada quanto na principal
- * porque define suas próprias funções e carrega os dados necessários
- */
+$title = 'Editar Cliente';
+$currentPage = 'customer';
 
-// Funções auxiliares simples (caso não existam)
-if (!function_exists('old')) {
-    function old($field, $default = '') {
-        return $_POST[$field] ?? $_SESSION['form_data'][$field] ?? $default;
-    }
-}
-
-if (!function_exists('e')) {
-    function e($string) {
-        return htmlspecialchars($string ?? '', ENT_QUOTES, 'UTF-8');
-    }
-}
-
-$title = 'Editar Cliente - Sistema de Barbearia';
-$currentPage = 'clientes';
-
-// Os dados do cliente já vêm do controller na variável $cliente
-// Não precisamos buscar novamente, apenas usar os dados que já temos
-
+include(__DIR__ . '/../layout/header.php');
 ?>
-
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $title ?></title>
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
-    <style>
-        :root {
-            --primary-color: #1700e6ff;
-            --secondary-color: #0c0d4eff;
-            --accent-color: #e74c3c;
-            --success-color: #27ae60;
-            --warning-color: #f39c12;
-            --info-color: #3B82F6;
-        }
-
-        .avatar-circle {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 14px;
-}
-        
-        body {
-            background-color: #f8f9fa;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        .navbar-brand {
-            font-weight: bold;
-            color: var(--primary-color) !important;
-        }
-        
-        .sidebar {
-            min-height: calc(100vh - 56px);
-            background: linear-gradient(180deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-        }
-        
-        .sidebar .nav-link {
-            color: #ecf0f1;
-            padding: 12px 20px;
-            margin: 2px 0;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-        
-        .sidebar .nav-link:hover {
-            background-color: rgba(255,255,255,0.1);
-            color: #fff;
-            transform: translateX(5px);
-        }
-        
-        .sidebar .nav-link.active {
-            background-color: var(--accent-color);
-            color: #fff;
-        }
-        
-        .sidebar .nav-link i {
-            width: 20px;
-            margin-right: 10px;
-        }
-        
-        .main-content {
-            padding: 20px;
-        }
-        
-        .page-header {
-            background: linear-gradient(135deg, #1700e6, #3225e9);
-            border-radius: 16px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            color: white;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-        
-        .modern-card {
-            background: white;
-            border-radius: 16px;
-            border: none;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-        }
-        
-        .modern-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
-        
-        .form-control, .form-select {
-            border-radius: 12px;
-            border: 2px solid #e5e7eb;
-            padding: 0.75rem 1rem;
-        }
-        
-        .form-control:focus, .form-select:focus {
-            border-color: #3498db;
-            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
-        }
-        
-        .btn {
-            border-radius: 12px;
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #3498db, #2980b9);
-            border: none;
-        }
-        
-        .btn-success {
-            background: linear-gradient(45deg, var(--success-color), #2ecc71);
-            border: none;
-            border-radius: 8px;
-        }
-        
-        .btn-danger {
-            background: linear-gradient(45deg, var(--accent-color), #c0392b);
-            border: none;
-            border-radius: 8px;
-        }
-        
-        .btn-warning {
-            background: linear-gradient(45deg, var(--warning-color), #e67e22);
-            border: none;
-            border-radius: 8px;
-        }
-        
-        .dropdown-menu {
-            border-radius: 8px;
-            border: none;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-        
-        @media (max-width: 768px) {
-            .sidebar {
-                min-height: auto;
-            }
-            
-            .main-content {
-                padding: 15px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/barbearia-new/dashboard">
-                <i class="fas fa-cut me-2"></i>
-                Sistema Barbearia
-            </a>
-            
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user-circle me-2"></i>
-                            <?= $_SESSION['user_nome'] ?? 'Usuário' ?>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="/barbearia-new/perfil">
-                                <i class="fas fa-user me-2"></i>Meu Perfil
-                            </a></li>
-                            
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="/barbearia-new/logout">
-                                <i class="fas fa-sign-out-alt me-2"></i>Sair
-                            </a></li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
 
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
-            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
-                <div class="position-sticky pt-3">
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link <?= $currentPage == 'dashboard' ? 'active' : '' ?>" href="/barbearia-new/dashboard">
-                                <i class="fas fa-tachometer-alt"></i>
-                                Dashboard
-                            </a>
-                        </li>
-                        
-                        <li class="nav-item">
-                            <a class="nav-link <?= $currentPage == 'agendamentos' ? 'active' : '' ?>" href="/barbearia-new/agendamentos">
-                                <i class="fas fa-calendar-alt"></i>
-                                Agendamentos
-                            </a>
-                        </li>
-                        
-                        <li class="nav-item">
-                            <a class="nav-link <?= $currentPage == 'clientes' ? 'active' : '' ?>" href="/barbearia-new/clientes">
-                                <i class="fas fa-users"></i>
-                                Clientes
-                            </a>
-                        </li>
-                        
-                        <?php if (($_SESSION['user_tipo'] ?? '') == 'administrador'): ?>
-                        <li class="nav-item">
-                            <a class="nav-link <?= $currentPage == 'barbeiros' ? 'active' : '' ?>" href="/barbearia-new/usuarios">
-                                <i class="fas fa-user-tie"></i>
-                                Barbeiros
-                            </a>
-                        </li>
-                        
-                        <li class="nav-item">
-                            <a class="nav-link <?= $currentPage == 'servicos' ? 'active' : '' ?>" href="/barbearia-new/servicos">
-                                <i class="fas fa-scissors"></i>
-                                Serviços
-                            </a>
-                        </li>
-                        
-                        <li class="nav-item">
-                            <a class="nav-link <?= $currentPage == 'financeiro' ? 'active' : '' ?>" href="/barbearia-new/financeiro">
-                                <i class="fas fa-chart-line"></i>
-                                Financeiro
-                            </a>
-                        </li>
-                        <?php endif; ?>
-                        
-                        <!-- <li class="nav-item">
-                            <a class="nav-link <?= $currentPage == 'agenda' ? 'active' : '' ?>" href="/barbearia-new/agenda">
-                                <i class="fas fa-calendar-week"></i>
-                                Minha Agenda
-                            </a>
-                        </li> -->
-                    </ul>
-                </div>
-            </nav>
-
+            <?php
+                include(__DIR__ . '/../layout/nav.php');
+            ?>
             <!-- Main content -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content pt-4">
+                
                 <!-- Cabeçalho -->
+                 
                 <div class="page-header">
-                    <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
                         <div>
-                            <h1 class="h2 mb-2">
+                            <h1 class="h3">
                                 <i class="fas fa-user-edit me-3"></i>
                                 Editar Cliente
                             </h1>
-                            <p class="mb-0 opacity-90">Atualize as informações do cliente</p>
                         </div>
                         <div>
-                            <a href="/barbearia-new/clientes" class="btn btn-light me-2">
-                                <i class="fas fa-arrow-left me-2"></i>
-                                Voltar aos Clientes
-                            </a>
-                            <a href="/barbearia-new/clientes/show/<?= $cliente['id'] ?>" class="btn btn-outline-light">
+                            <a href="<?= SITE_URL ?>/portal" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>
+                            Voltar
+                        </a>
+                            <a href="<?php echo(SITE_URL.'/detalhes_cliente').'/'. $customer['id'] ?>" class="btn btn-outline-light">
                                 <i class="fas fa-eye me-2"></i>
                                 Ver Detalhes
                             </a>
@@ -315,144 +46,149 @@ $currentPage = 'clientes';
                     </div>
                 <?php endif; ?>
 
-                <?php if (isset($_SESSION['error'])): ?>
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <i class="fas fa-exclamation-circle me-2"></i>
-                        <?= $_SESSION['error']; unset($_SESSION['error']); ?>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                <?php endif; ?>
-
-                <?php if (isset($_SESSION['errors']) && is_array($_SESSION['errors'])): ?>
+                <?php if (isset($_SESSION['error']) && is_array($_SESSION['error'])): ?>
                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
                         <i class="fas fa-exclamation-triangle me-2"></i>
                         <ul class="mb-0">
-                            <?php foreach ($_SESSION['errors'] as $error): ?>
-                                <li><?= e($error) ?></li>
+                            <?php foreach ($_SESSION['error'] as $error): ?>
+                                <li><?= $error ?></li>
                             <?php endforeach; ?>
                         </ul>
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
-                    <?php unset($_SESSION['errors']); ?>
+                    <?php unset($_SESSION['error']); ?>
                 <?php endif; ?>
 
-                <div class="row justify-content-center">
-                    <div class="col-lg-8">
-                        <div class="modern-card">
-                            <div class="card-header bg-transparent border-0 pt-4 px-4">
-                                <h5 class="card-title mb-0 fw-bold">
-                                    <i class="fas fa-user-edit me-2 text-primary"></i>
-                                    Dados do Cliente
-                                </h5>
-                            </div>
-                            <div class="card-body p-4">
-                                <form method="POST" action="/barbearia-new/clientes/update/<?= $cliente['id'] ?>" id="formEditarCliente">
-                                    <input type="hidden" name="id" value="<?= $cliente['id'] ?>">
-                                    
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="mb-3">
-                                                <label for="nome" class="form-label">
-                                                    <i class="fas fa-user me-1"></i>
-                                                    Nome Completo *
-                                                </label>
-                                                <input type="text" name="nome" id="nome" class="form-control" 
-                                                       value="<?= e(old('nome', $cliente['nome'] ?? '')) ?>" 
-                                                       placeholder="Digite o nome completo" required>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label for="telefone" class="form-label">
-                                                    <i class="fas fa-phone me-1"></i>
-                                                    Telefone *
-                                                </label>
-                                                <input type="tel" name="telefone" id="telefone" class="form-control" 
-                                                       value="<?= e(old('telefone', $cliente['telefone'] ?? '')) ?>" 
-                                                       placeholder="(11) 99999-9999" required>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label for="data_nascimento" class="form-label">
-                                                    <i class="fas fa-birthday-cake me-1"></i>
-                                                    Data de Nascimento
-                                                </label>
-                                                <input type="date" name="data_nascimento" id="data_nascimento" class="form-control" 
-                                                       value="<?= e(old('data_nascimento', $cliente['data_nascimento'] ?? '')) ?>" 
-                                                       max="<?= date('Y-m-d') ?>">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label for="email" class="form-label">
-                                                    <i class="fas fa-envelope me-1"></i>
-                                                    E-mail
-                                                </label>
-                                                <input type="email" name="email" id="email" class="form-control" 
-                                                       value="<?= e(old('email', $cliente['email'] ?? '')) ?>" 
-                                                       placeholder="cliente@email.com">
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <label for="endereco" class="form-label">
-                                                    <i class="fas fa-map-marker-alt me-1"></i>
-                                                    Endereço
-                                                </label>
-                                                <input type="text" name="endereco" id="endereco" class="form-control" 
-                                                       value="<?= e(old('endereco', $cliente['endereco'] ?? '')) ?>" 
-                                                       placeholder="Rua, número, bairro">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-user-plus me-2"></i>
+                            Dados do Cliente
+                        </h6>
+                    </div>
+                    <div class="card-body p-4">
+                        <form method="POST" action="<?= SITE_URL ?>/update_cliente/<?= $customer['id'] ?>" id="formEditarCliente">
+                            <input type="hidden" name="id" value="<?= $customer['id'] ?>">
+                            
+                            <div class="row">
+                                <div class="col-md-12">
                                     <div class="mb-3">
-                                        <label for="observacoes" class="form-label">
-                                            <i class="fas fa-comment me-1"></i>
-                                            Observações
+                                        <label for="nome" class="form-label">
+                                            <i class="fas fa-user me-1"></i>
+                                            Nome Completo *
                                         </label>
-                                        <textarea name="observacoes" id="observacoes" class="form-control" rows="4" 
-                                                  placeholder="Observações sobre o cliente..."><?= e(old('observacoes', $cliente['observacoes'] ?? '')) ?></textarea>
+                                        <input type="text" name="name" id="name" class="form-control" 
+                                                value="<?= $customer['name'] ?? '' ?>" 
+                                                placeholder="Digite o nome completo" required>
                                     </div>
-                                    
-                                    <div class="d-flex justify-content-between">
-                                        <div>
-                                            <a href="/barbearia-new/clientes" class="btn btn-secondary">
-                                                <i class="fas fa-times me-1"></i>
-                                                Cancelar
-                                            </a>
-                                        </div>
-                                        <div>
-                                            <button type="button" class="btn btn-danger me-2" onclick="confirmarExclusao(<?php echo $id; ?>)">
-                                                <i class="fas fa-trash me-1"></i>
-                                                Excluir Cliente
-                                            </button>
-                                            <button type="submit" class="btn btn-primary">
-                                                <i class="fas fa-save me-1"></i>
-                                                Salvar Alterações
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
+                                </div>
                             </div>
-                        </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="telefone" class="form-label">
+                                            <i class="fas fa-phone me-1"></i>
+                                            Telefone *
+                                        </label>
+                                        <input type="tel" name="phone" id="phone" class="form-control" 
+                                                value="<?= $customer['phone'] ?? '' ?>" 
+                                                placeholder="(11) 99999-9999" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="data_nascimento" class="form-label">
+                                            <i class="fas fa-birthday-cake me-1"></i>
+                                            Data de Nascimento
+                                        </label>
+                                        <input type="date" name="date_birth" id="date_birth" class="form-control" 
+                                                value="<?= $customer['date_birth'] ?? '' ?>" 
+                                                max="<?= date('Y-m-d') ?>">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="email" class="form-label">
+                                            <i class="fas fa-envelope me-1"></i>
+                                            E-mail
+                                        </label>
+                                        <input type="email" name="email" id="email" class="form-control" 
+                                                value="<?= $customer['email'] ?? '' ?>" 
+                                                placeholder="cliente@email.com">
+                                    </div>
+                                </div>
+                                
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="cpf" class="form-label">
+                                        <i class="fas fa-envelope me-1"></i>
+                                        CPF *
+                                    </label>
+                                    <input type="text" class="form-control" id="cpf" name="cpf" placeholder="000.000.000-00" maxlength="14" value="<?= $customer['cpf'] ?? '' ?>"  required/>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="date_birth" class="form-label">
+                                        <i class="fas fa-birthday-cake me-1"></i>
+                                        RG *
+                                    </label>
+                                    <input class="form-control" id="rg" name="rg" type="text" inputmode="numeric" placeholder="00.000.000-0" maxlength="12" value="<?= $customer['rg'] ?? '' ?>"  required/>
+                                </div>
+                            </div>
+
+                            <label class="form-label">
+                                <i class="fas fa-map-marker-alt me-1"></i>
+                                Endereços
+                            </label>
+                            <div id="enderecos-wrapper">
+                                <?php foreach($addresses as $index => $address): ?>
+                                <div class="input-group mb-2 endereco-row">
+                                    <input type="hidden" name="addresses[<?= $index ?>][id]" value="<?= $address['id'] ?>">
+                                    <input type="text" name="addresses[<?= $index ?>][address]" class="form-control"
+                                        value="<?= $address['address'] ?>" placeholder="Rua, número, bairro, cidade" required>
+                                    <button type="button" class="btn btn-danger remove-endereco">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                                <?php endforeach; ?>
+                            </div>
+
+                            <button type="button" id="add-endereco" class="btn btn-success btn-sm mt-2">
+                                <i class="fas fa-plus"></i> Adicionar Endereço
+                            </button>
+
+                                                                       
+                            <div class="d-flex justify-content-end gap-2">
+                                <div>
+                                    <a href="<?= SITE_URL ?>/portal" class="btn btn-secondary">
+                                        <i class="fas fa-times me-1"></i>
+                                        Cancelar
+                                    </a>
+                                </div>
+                                <div>
+                                    <button type="button" class="btn btn-danger me-2" onclick="confirmarExclusao(<?php echo $id; ?>, '<?php echo SITE_URL; ?>')">
+                                        <i class="fas fa-trash me-1"></i>
+                                        Excluir Cliente
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-1"></i>
+                                        Salvar Alterações
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </main>
         </div>
     </div>
-
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -500,7 +236,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-function confirmarExclusao(id) {
+function confirmarExclusao(id,SITE_URL) {
     if (confirm('Tem certeza que deseja excluir este cliente?\n\nEsta ação não pode ser desfeita.')) {
         
         // Mostrar loading
@@ -510,7 +246,7 @@ function confirmarExclusao(id) {
         button.disabled = true;
         
         // Tentar primeiro com fetch DELETE
-        fetch(`/barbearia-new/clientes/delete/${id}`, {
+        fetch(`${SITE_URL}/cliente/delete/${id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -523,7 +259,7 @@ function confirmarExclusao(id) {
                 window.location.reload();
             } else if (response.status === 404) {
                 // Se DELETE não funcionar, tentar POST
-                enviarExclusaoViaPOST(id);
+                enviarExclusaoViaPOST(id,SITE_URL);
             } else {
                 throw new Error('Erro na exclusão');
             }
@@ -531,7 +267,7 @@ function confirmarExclusao(id) {
         .catch(error => {
             console.log('Fetch falhou, tentando POST...', error);
             // Fallback: usar POST
-            enviarExclusaoViaPOST(id);
+            enviarExclusaoViaPOST(id,SITE_URL);
         })
         .finally(() => {
             // Restaurar botão
@@ -541,11 +277,11 @@ function confirmarExclusao(id) {
     }
 }
 
-function enviarExclusaoViaPOST(id) {
+function enviarExclusaoViaPOST(id,SITE_URL) {
     // Criar formulário oculto
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = `/barbearia-new/clientes/delete/${id}`;
+    form.action = `${SITE_URL}/cliente/delete/${id}`;
     form.style.display = 'none';
     
     // Adicionar token CSRF se necessário
@@ -569,7 +305,39 @@ function enviarExclusaoViaPOST(id) {
     document.body.appendChild(form);
     form.submit();
 }
-</script>
 
-</body>
-</html>
+document.addEventListener('DOMContentLoaded', function() {
+    const wrapper = document.getElementById('enderecos-wrapper');
+    const addButton = document.getElementById('add-endereco');
+
+    // Remover endereço
+    wrapper.addEventListener('click', function(e) {
+        if (e.target.closest('.remove-endereco')) {
+            const row = e.target.closest('.endereco-row');
+            row.remove();
+        }
+    });
+
+    // Adicionar novo endereço
+    let index = <?= count($addresses) ?>; // começa do próximo índice
+
+    addButton.addEventListener('click', function() {
+        const row = document.createElement('div');
+        row.classList.add('input-group', 'mb-2', 'endereco-row');
+
+        row.innerHTML = `
+            <input type="hidden" name="addresses[${index}][id]" value="">
+            <input type="text" name="addresses[${index}][address]" class="form-control" placeholder="Rua, número, bairro, cidade" required>
+            <button type="button" class="btn btn-danger remove-endereco">
+                <i class="fas fa-trash"></i>
+            </button>
+        `;
+
+        wrapper.appendChild(row);
+        index++;
+    });
+});
+</script>
+<?php
+include(__DIR__ . '/../layout/footer.php');
+?>
